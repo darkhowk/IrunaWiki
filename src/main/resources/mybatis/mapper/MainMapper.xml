@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iruna.wiki.model.mapper.MainMapper">
+
+	<select id="getMenu" resultType="hashmap">
+		SELECT 
+			*
+		FROM 
+			IRUNA_MENU
+		START WITH PARENT_SEQ = '0000' 
+		CONNECT BY PRIOR IRUNA_MENU_SEQ = PARENT_SEQ 
+	</select>
+
+	<select id="getItems" parameterType="String" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			ITEMS_MASTER
+		WHERE 1=1
+		AND TYPE = VALUE_TO_CODE(#{value})
+		
+	</select>
+
+	<select id="getTitle" parameterType="String" resultType="String">
+		SELECT
+			  CODE_TO_WORD(VALUE_TO_CODE(#{value}), 'K') AS TITLE
+		FROM
+			DUAL
+		
+	</select>
+
+</mapper>

@@ -1,0 +1,218 @@
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+	<div class="col-lg-6 mb-4" id="list">
+		<div class="card mb-4 py-3 border-left-dark">
+			<div class="card-body h3 mb-2 text-gray-800" id="title" align="center"></div>
+		</div>
+	</div>
+</div>
+<div class="dim-layer">
+	<div class="dimBg"></div>
+	<div id="layer2" class="pop-layer">
+		<div class="pop-container">
+			<div class="pop-conts" id="eq_text">
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	let data = JSON.parse('[(${data})]');
+	let title = '[(${title})]';
+	$("#title").text(title);
+
+	for (idx in data) {
+		var text = '';
+		var items = data[idx];
+		var KO_NAME = items.KO_NAME;
+		var JP_NAME = items.JP_NAME;
+		var EN_NAME = items.EN_NAME;
+		var SEQ = items.ITEMS_MASTER_SEQ;
+		var USE_YN = items.USE_YN;
+
+		if (USE_YN == "Y") {
+			text += '<div class="card shadow mb-4 item-detail" href="#layer2" seq="'+SEQ+'" >';
+			text += '<div class="card-header py-3">';
+			text += '<h6 class="m-0 font-weight-bold text-primary">' + KO_NAME
+					+ '</h6>';
+			text += '</div>';
+			text += '<div class="card-body">';
+			text += '일본어 명 : ' + JP_NAME + '<br>';
+			text += '영어 명 : ' + EN_NAME;
+			text += '</div>';
+			text += '</div>';
+
+			$("#list").append(text);
+		}
+
+	}
+
+	$('.item-detail').click(
+			function() {
+				var $href = $(this).attr('href');
+				var $item_seq = $(this).attr('seq');
+				// ajax 로 데이터 가져와서 아이템 자료 넣는다.
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : "/ajax/getItemDetail",
+					data : $item_seq,
+					dataType : 'text',
+					cache : false,
+					timeout : 600000,
+					success : function(data) {
+						if (data.length <= 2){
+							alert("데이터가 없습니다.");
+						}
+						else{
+							var obj = JSON.parse(data)[0];
+							// layer 에 담기
+							$("#eq_text").children().remove();
+							var text = "";
+							
+							// 이름
+							text += '<div>'+obj.KO_NAME +' / '+ obj.JP_NAME +' / ' + obj.EN_NAME +'</div>';
+							
+							// 공격력
+							if (obj.ATK != undefined){
+								text += '<div>ATK (퀄리티 0 ) : '+obj.ATK+'</div>';
+							}
+							// 특이사항
+							if(obj.ETC !=undefined){
+								text += '<div>'+obj.ETC+'</div>';
+							}
+							// 드롭 몬스터
+							if (obj.DROP1 != undefined){
+								text += '<div>드롭1 : '+obj.DROP1+'</div>';
+// 								text += '출현 장소 : '++'</div>';
+							}
+							if (obj.DROP2 != undefined){
+								text += '<div>드롭2 : '+obj.DROP2+'</div>';
+							}
+							if (obj.DROP3 != undefined){
+								text += '<div>드롭3 : '+obj.DROP3+'</div>';
+							}
+							
+							// 이미지
+							if (obj.IMG_PATH != undefined){
+								text += '<img src="'+obj.IMG_PATH+'" width=100% height=100% >';
+							}
+							// 닫기버튼
+							text += '<div class="btn-r">';
+							text += '<a href="#" class="btn-layerClose">Close</a>';
+							text += '</div>';
+							
+							$("#eq_text").append(text);
+							
+							layer_popup($href);
+						}
+					},
+					error : function(e) {
+						console.log("ERROR : ", e);
+					}
+				});
+			});
+	function layer_popup(el) {
+
+		var $el = $(el); //레이어의 id를 $el 변수에 저장
+		var isDim = $el.prev().hasClass('dimBg'); //dimmed 레이어를 감지하기 위한 boolean 변수
+
+		isDim ? $('.dim-layer').fadeIn() : $el.fadeIn();
+
+		$el.css({
+			top : 0,
+			left : 0
+		});
+
+		$el.find('a.btn-layerClose').click(function() {
+			isDim ? $('.dim-layer').fadeOut() : $el.fadeOut(); // 닫기 버튼을 클릭하면 레이어가 닫힌다.
+			return false;
+		});
+
+		$('.layer .dimBg').click(function() {
+			console.log("??");
+			$('.dim-layer').fadeOut();
+			return false;
+		});
+
+	}
+
+	function monster_img_show() {
+		$("img").css("display", "block");
+	}
+</script>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+}
+
+.pop-layer .pop-container {
+	padding: 20px 25px;
+}
+
+.pop-layer p.ctxt {
+	color: #666;
+	line-height: 25px;
+}
+
+.pop-layer .btn-r {
+	width: 99%;
+	border-top: 1px solid #DDD;
+	text-align: right;
+}
+
+.pop-layer {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 80%;
+	height: auto;
+	background-color: #fff;
+	border: 5px solid #3571B5;
+	z-index: 10;
+}
+
+.dim-layer {
+	display: none;
+	position: fixed;
+	_position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+}
+
+.dim-layer .dimBg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+	opacity: .5;
+	filter: alpha(opacity = 50);
+}
+
+.dim-layer .pop-layer {
+	display: block;
+}
+
+a.btn-layerClose {
+	display: inline-block;
+	height: 25px;
+	padding: 0 14px 0;
+	border: 1px solid #304a8a;
+	background-color: #3f5a9d;
+	font-size: 13px;
+	color: #fff;
+	line-height: 25px;
+}
+
+a.btn-layerClose:hover {
+	border: 1px solid #091940;
+	background-color: #1f326a;
+	color: #fff;
+}
+</style>

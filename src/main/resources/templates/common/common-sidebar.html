@@ -1,0 +1,57 @@
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+	<!-- Sidebar - Brand -->
+	<a class="sidebar-brand d-flex align-items-center justify-content-center" href="main">
+		<div class="sidebar-brand-icon rotate-n-15">
+			<i class="fas fa-battery-three-quarters"></i>
+		</div>
+		<div class="sidebar-brand-text mx-3">이루나전기</div>
+	</a>
+</ul>
+
+
+<script>
+	let menu = JSON.parse('[(${session.menu})]');
+	
+	for (idx in menu) {
+		var text = '';
+		var items = menu[idx];
+		var PARENT_SEQ = items.PARENT_SEQ;
+		var MENU_NAME = items.MENU_NAME;
+		var IRUNA_MENU_SEQ = items.IRUNA_MENU_SEQ;
+		var MENU_PATH = items.MENU_PATH;
+		var USE_YN = items.USE_YN;
+
+		if (PARENT_SEQ == '0000') {
+			text += '<hr class="sidebar-divider my-0">';
+			text += '<li class="nav-item" >';
+			text += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#'+MENU_NAME+'" aria-expanded="true" aria-controls="collapseTwo">';
+			text += '<i class="fas fa-fw fa-cog"></i> ';
+			text += '<span>' + MENU_NAME + '</span>';
+			text += '</a>';
+			text += '<div id="'+MENU_NAME+'" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">';
+			text += '<div class="bg-white py-2 collapse-inner rounded" id="'+IRUNA_MENU_SEQ+'">';
+			text += '</div>';
+			text += '</div>';
+			text += '</li>';
+			$("#accordionSidebar").append(text);
+		} else {
+// 			if (USE_YN == 'Y') {
+				text += '<a class="collapse-item" href="'+MENU_PATH+'">'+ MENU_NAME + '</a>';
+// 			}
+// 			else{
+// 				text += '<a class="collapse-item" href="#">'+ MENU_NAME + '</a>';
+// 			}
+			$("#" + PARENT_SEQ).append(text);
+		}
+	}
+
+	var toggle = "";
+	toggle += '<hr class="sidebar-divider d-none d-md-block">';
+	toggle += '<div class="text-center d-none d-md-inline">';
+	toggle += '<button class="rounded-circle border-0" id="sidebarToggle"></button>';
+	toggle += '</div>';
+
+	$("#accordionSidebar").append(toggle);
+</script>
+
+
